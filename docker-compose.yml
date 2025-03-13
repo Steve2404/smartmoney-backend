@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: smartmoney_db
+    environment:
+      - POSTGRES_DB=smartmoney_db
+      - POSTGRES_USER=Steve
+      - POSTGRES_PASSWORD=smart
+    ports:
+      - '5432:5432'
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+volumes:
+  postgres_data:
