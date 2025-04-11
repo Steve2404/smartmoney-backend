@@ -1,5 +1,6 @@
 package com.geekinstitut.smartmoney.model;
 
+import com.geekinstitut.smartmoney.dto.TransactionResponseDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,4 +32,18 @@ public abstract class Transaction {
 
     @Column(nullable = false)
     private LocalDate date;
+
+    /**
+     * Convertit une transaction en DTO de réponse.
+     */
+    public TransactionResponseDTO toResponse() {
+        return new TransactionResponseDTO(
+            this.id,
+            this.category.getId(),
+            this.category.getName(),
+            this.amount,
+            this.note,
+            this.date
+        );
+    }
 }
