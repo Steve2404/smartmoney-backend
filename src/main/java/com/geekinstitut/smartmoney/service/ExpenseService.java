@@ -39,7 +39,7 @@ public class ExpenseService {
         Category category = categoryRepository.findById(requestDTO.getCategoryId())
                 .orElseThrow(() -> new EntityNotFoundException("Category not found"));
 
-        if(category.getType() != CategoryType.INCOME) {
+        if(category.getType() != CategoryType.EXPENSE) {
             throw new RuntimeException("Category type is not INCOME");
         }
         Expense expense = new Expense();
@@ -55,7 +55,7 @@ public class ExpenseService {
         var category = categoryRepository.findById(requestDTO.getCategoryId())
                 .orElseThrow(() -> new EntityNotFoundException("Category not found"));
 
-        if(category.getType() != CategoryType.INCOME) {
+        if(category.getType() != CategoryType.EXPENSE) {
             throw new RuntimeException("Category type is not INCOME");
         }
 
