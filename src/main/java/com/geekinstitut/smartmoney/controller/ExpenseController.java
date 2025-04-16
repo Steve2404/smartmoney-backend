@@ -43,7 +43,7 @@ public class ExpenseController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<TransactionResponseDTO> deleteExpense(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteExpense(@PathVariable UUID id) {
         expenseService.deleteExpenseById(id);
         return ResponseEntity.noContent().build();
     }

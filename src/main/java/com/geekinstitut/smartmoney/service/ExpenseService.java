@@ -34,42 +34,35 @@ public class ExpenseService {
         return expenseRepository.findById(id).map(Expense::toResponse).orElseThrow(() -> new RuntimeException("Expense not found with id: " + id));
     }
 
-
-    public TransactionResponseDTO createExpense(TransactionRequestDTO requestDTO) {
-        Category category = categoryRepository.findById(requestDTO.getCategoryId())
+    private Category getCategory(UUID categoryId) {
+        return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+    }
 
-        if(category.getType() != CategoryType.EXPENSE) {
-            throw new RuntimeException("Category type is not INCOME");
+    private void populateExpenseFromDTO(Expense expense, TransactionRequestDTO requestDTO) {
+        Category category = getCategory(requestDTO.getCategoryId());
+        if (category.getType() != CategoryType.EXPENSE) {
+            throw new RuntimeException("Category type is not Expense");
         }
-        Expense expense = new Expense();
         expense.setCategory(category);
         expense.setAmount(requestDTO.getAmount());
         expense.setNote(requestDTO.getNote());
         expense.setDate(requestDTO.getDate());
+    }
 
+    public TransactionResponseDTO createExpense(TransactionRequestDTO requestDTO) {
+        Expense expense = new Expense();
+        populateExpenseFromDTO(expense, requestDTO);
         return expenseRepository.save(expense).toResponse();
     }
 
     public TransactionResponseDTO updateExpense(UUID id, TransactionRequestDTO requestDTO) {
-        var category = categoryRepository.findById(requestDTO.getCategoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
-
-        if(category.getType() != CategoryType.EXPENSE) {
-            throw new RuntimeException("Category type is not INCOME");
-        }
-
-        return expenseRepository.findById(id)
-                .map(expense ->{
-                    expense.setCategory(category);
-                    expense.setAmount(requestDTO.getAmount());
-                    expense.setNote(requestDTO.getNote());
-                    expense.setDate(requestDTO.getDate());
-                    return expenseRepository.save(expense).toResponse();
-
-                })
-                .orElseThrow(() -> new RuntimeException("Expense not found with id: " + id));
+        return expenseRepository.findById(id).map(expense -> {
+            populateExpenseFromDTO(expense, requestDTO);
+            return expenseRepository.save(expense).toResponse();
+        }).orElseThrow(() -> new RuntimeException("Expense not found with id: " + id));
     }
+
 
     public void deleteExpenseById(UUID id) {
         if (!expenseRepository.existsById(id)) {

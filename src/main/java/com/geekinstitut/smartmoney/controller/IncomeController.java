@@ -43,7 +43,7 @@ public class IncomeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<TransactionResponseDTO> deleteIncome(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteIncome(@PathVariable UUID id) {
         incomeService.deleteIncomeById(id);
         return ResponseEntity.noContent().build();
     }
