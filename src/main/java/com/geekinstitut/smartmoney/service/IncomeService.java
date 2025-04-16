@@ -33,40 +33,33 @@ public class IncomeService {
     }
 
 
-    public TransactionResponseDTO createIncome(TransactionRequestDTO requestDTO) {
-        Category category = categoryRepository.findById(requestDTO.getCategoryId())
+    private Category getCategory(UUID categoryId) {
+        return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+    }
 
-        if(category.getType() != CategoryType.INCOME) {
-            throw new RuntimeException("Category type is not INCOME");
+    private void populateIncomeFromDTO(Income income, TransactionRequestDTO requestDTO) {
+        Category category = getCategory(requestDTO.getCategoryId());
+        if (category.getType() != CategoryType.INCOME) {
+            throw new RuntimeException("Category type is not Income");
         }
-        Income income = new Income();
         income.setCategory(category);
         income.setAmount(requestDTO.getAmount());
         income.setNote(requestDTO.getNote());
         income.setDate(requestDTO.getDate());
+    }
 
+    public TransactionResponseDTO createIncome(TransactionRequestDTO requestDTO) {
+        Income income = new Income();
+        populateIncomeFromDTO(income, requestDTO);
         return incomeRepository.save(income).toResponse();
     }
 
     public TransactionResponseDTO updateIncome(UUID id, TransactionRequestDTO requestDTO) {
-        var category = categoryRepository.findById(requestDTO.getCategoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
-
-        if(category.getType() != CategoryType.INCOME) {
-            throw new RuntimeException("Category type is not INCOME");
-        }
-
-        return incomeRepository.findById(id)
-                .map(income ->{
-                    income.setCategory(category);
-                    income.setAmount(requestDTO.getAmount());
-                    income.setNote(requestDTO.getNote());
-                    income.setDate(requestDTO.getDate());
-                    return incomeRepository.save(income).toResponse();
-
-                })
-                .orElseThrow(() -> new RuntimeException("Income not found with id: " + id));
+        return incomeRepository.findById(id).map(income -> {
+            populateIncomeFromDTO(income, requestDTO);
+            return incomeRepository.save(income).toResponse();
+        }).orElseThrow(() -> new RuntimeException("Income not found with id: " + id));
     }
 
     public void deleteIncomeById(UUID id) {
