@@ -1,2 +1,6 @@
-CREATE SCHEMA IF NOT EXISTS smartmoney;
-GRANT ALL ON SCHEMA smartmoney_db TO postgres;
+CREATE ROLE Steve WITH LOGIN PASSWORD 'smart';
+
+CREATE SCHEMA IF NOT EXISTS smartmoney AUTHORIZATION Steve;
+
+GRANT ALL ON SCHEMA smartmoney TO Steve;
+
